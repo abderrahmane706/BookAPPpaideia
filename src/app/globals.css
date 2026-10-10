@@ -1,0 +1,1096 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   PAIDEIA — Global Theme
+   A living classical scholarly publication.
+   Monochromatic blue-ink engraving on ivory parchment. Fine etched linework,
+   architectural + scientific motifs, refined editorial serif typography.
+   ========================================================================== */
+
+:root {
+  /* ------------------------------------------------------------------
+     Colour system — warm parchment + soft engraved blue on ivory.
+     Text tokens tuned to WCAG 4.5:1 on parchment & surface (verified).
+     ------------------------------------------------------------------ */
+  --parchment: #f3eee1;
+  --parchment-shade: #e9e2d0;
+  --parchment-deep: #dcd4bb;
+
+  /* Ink (text) — deep blue-black, the colour of printed ink on paper. */
+  --ink: #1a54a5; /* ~12:1 on parchment — primary body text */
+  --ink-soft: #41689e; /* ~4.9:1 — secondary text (meets AA small) */
+  --ink-faint: #5b6b82; /* ~4.7:1 — captions, metadata (meets AA small) */
+
+  /* Printed-blue accents — drawn from the engraving reference. The softer
+     --ink-blue tones are decorative; the engraving family carries the
+     interactive borders, focus rings and emphasised text. */
+  --ink-blue: #5188cf; /* decorative accents / large text (4.0:1 on parchment) */
+  --ink-blue-soft: #81b7fd; /* faint blue tints & linework only */
+  --engraving: #4e6c92; /* ~4.7:1 — controls, focus, links */
+  --engraving-deep: #3070c9; /* ~7.8:1 — emphasised text */
+  --engraving-soft: #7892b3; /* large text / ink only */
+  --engraving-faint: #a9b8cc; /* muted linework & tints only */
+
+  /* Warm gold — restrained antique accent. Text-safe gold for captions. */
+  --gold: #8a682f; /* ~4.9:1 on parchment & surface */
+  --gold-soft: #a8895a; /* decorative fills / ornaments only */
+
+  /* Line weights — engraved hairlines. */
+  --line: rgba(221, 214, 182, 0.82);
+  --line-strong: rgba(189, 197, 143, 0.96);
+  --line-ink: rgba(31, 45, 64, 0.22);
+
+  /* Semantic */
+  --success: #2f7d55;
+  --warning: #8a5a12;
+  --danger: #8f2b1c;
+
+  /* Modal scrim — a deep ink veil behind dialogs (theme-aware). */
+  --scrim: rgba(31, 45, 64, 0.45);
+
+  /* Forms & native controls follow the active theme. */
+  color-scheme: light;
+
+  /* Surfaces — paper tiers */
+  --surface: #faf6ec; /* default card / paper */
+  --surface-raised: #fefcf5; /* elevated: modals, feature cards */
+  --surface-sunken: #eae4d2; /* wells, recessed zones */
+  --surface-engraving: #eef0ed; /* cool blue-tinted plate surfaces */
+
+  /* Radii — restrained, editorial (avoid pill/SaaS rounding). */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 7px;
+  --radius-lg: 11px;
+
+  /* Spacing scale (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  /* Section rhythm */
+  --section-gap: clamp(3rem, 7vw, 5rem);
+
+  /* Type — font values come from next/font's variable classes on <html>
+     (--font-display / --font-body / --font-utility / --font-ornament).
+     Do NOT redefine them here: a self-reference would clobber them. */
+
+  /* Fluid type scale — clamped so headings scale smoothly with the viewport
+     and never jump at breakpoints (which is what causes uncontrolled wraps). */
+  --text-display: clamp(2.25rem, 1.55rem + 3.4vw, 3.5rem);
+  --text-chapter: clamp(1.75rem, 1.35rem + 1.9vw, 2.75rem);
+  --text-section: clamp(1.25rem, 1.13rem + 0.55vw, 1.6rem);
+  --text-lead: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+
+  /* Container widths */
+  --container-max: 76rem;
+  --container-narrow: 44rem;
+
+  /* Elevation — soft, book-like shadow; no harsh SaaS shadows. */
+  --shadow-card:
+    0 1px 2px rgba(31, 42, 56, 0.05),
+    0 5px 16px rgba(31, 42, 56, 0.05);
+  --shadow-card-hover:
+    0 2px 4px rgba(31, 42, 56, 0.07),
+    0 12px 30px rgba(31, 42, 56, 0.1);
+  --shadow-well:
+    inset 0 1px 2px rgba(31, 42, 56, 0.08),
+    inset 0 10px 24px rgba(31, 42, 56, 0.05);
+
+  /* Illustration plate */
+  --illustration-bg:
+    radial-gradient(120% 90% at 50% 0%, #f4eee0 0%, var(--surface-sunken) 100%);
+  --illustration-border: var(--line-strong);
+  --illustration-radius: var(--radius-sm);
+
+  /* ------------------------------------------------------------------
+     Paper & engraving texture
+     A premium scholarly book on high-quality parchment: subtle grain,
+     faint fiber noise, restrained printed-ink variation. Textures are
+     deliberately faint so they never cost readability.
+     ------------------------------------------------------------------ */
+  --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)' opacity='0.045'/></svg>");
+
+  --paper-fiber: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='f'><feTurbulence type='turbulence' baseFrequency='0.012 0.1' numOctaves='2' seed='7'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23f)' opacity='0.035'/></svg>");
+
+  /* Page-level aged paper: base tone + a soft warm vignette toward the edges. */
+  --paper-base: #f3eee1;
+  --paper-vignette: radial-gradient(
+    120% 110% at 50% 38%,
+    rgba(236, 229, 211, 0) 52%,
+    rgba(140, 105, 58, 0.1) 82%,
+    rgba(120, 88, 48, 0.16) 100%
+  );
+}
+
+@theme {
+  --color-parchment: var(--parchment);
+  --color-parchment-shade: var(--parchment-shade);
+  --color-parchment-deep: var(--parchment-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-blue: var(--ink-blue);
+  --color-ink-blue-soft: var(--ink-blue-soft);
+  --color-engraving: var(--engraving);
+  --color-engraving-deep: var(--engraving-deep);
+  --color-engraving-soft: var(--engraving-soft);
+  --color-engraving-faint: var(--engraving-faint);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-engraving: var(--surface-engraving);
+  --color-scrim: var(--scrim);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-utility: var(--font-utility);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
+  --shadow-well: var(--shadow-well);
+
+  --container-max: var(--container-max);
+  --container-narrow: var(--container-narrow);
+
+  --animate-fade-in: fade-in 0.6s ease both;
+  --animate-rise: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-ink: ink-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The hero plate inks in like an etching being printed. */
+@keyframes ink-in {
+  from {
+    opacity: 0;
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--paper-base);
+  color: var(--ink);
+  font-family: var(--font-body);
+  background-image: var(--paper-grain), var(--paper-fiber), var(--paper-vignette);
+  background-repeat: repeat, repeat, no-repeat;
+  background-attachment: fixed, scroll, fixed;
+  background-size: auto, auto, cover;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Focus visibility for accessibility */
+:focus-visible {
+  outline: 2px solid var(--engraving);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Display font — GFS Didot ships only weight 400.                    */
+/* Suppress faux-bold synthesis so headings render as clean Didot      */
+/* rather than synthetic bold (which looks muddy on a high-contrast    */
+/* didone face).                                                       */
+/* ------------------------------------------------------------------ */
+.font-display {
+  font-synthesis: none;
+  /* Stated fallback stack: the approved GFS Didot, then Cormorant Garamond,
+     then a system serif — so display type degrades gracefully if GFS Didot
+     is unavailable. next/font already appends its metric-adjusted fallback. */
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+}
+
+/* ------------------------------------------------------------------ */
+/* Editorial type helpers                                              */
+/* ------------------------------------------------------------------ */
+
+/* Kicker / section eyebrow — small letterspaced gold label above headings. */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--font-utility);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.kicker::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  background-color: color-mix(in srgb, var(--gold) 65%, transparent);
+}
+
+/* Letterspaced small label (book plates, captions, numbers). */
+.small-caps {
+  font-family: var(--font-utility);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Engraved ink underline — inks in from the left on hover and keyboard focus.
+   On hover-less (touch) devices it is shown statically so nothing is lost. */
+.ink-underline {
+  position: relative;
+}
+.ink-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1px;
+  background-color: var(--gold);
+  transition: width 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.ink-underline:hover::after,
+.ink-underline:focus-visible::after {
+  width: 100%;
+}
+@media (hover: none) {
+  .ink-underline::after {
+    width: 100%;
+    opacity: 0.5;
+  }
+}
+
+/* Display-font heading scales — fluid, centralised. Pair with `font-display`
+   + a weight utility; these only own the size/leading so wrapping stays under
+   the heading's control. Display face is reserved for H1 / major chapter
+   titles / selected editorial headings — never small controls or metadata. */
+.heading-display {
+  font-size: var(--text-display);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+}
+.heading-chapter {
+  font-size: var(--text-chapter);
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+}
+.heading-section {
+  font-size: var(--text-section);
+  line-height: 1.2;
+}
+/* Lead paragraph under a display heading. */
+.lead {
+  font-family: var(--font-body);
+  font-size: var(--text-lead);
+  line-height: 1.6;
+}
+
+/* ================================================================== */
+/* Manuscript ornament set                                            */
+/* "Mesures" is a dingbat face (26 glyphs mapped to a–z) used here as  */
+/* sparse decorative flourishes, never as functional UI icons.        */
+/* ================================================================== */
+
+/* Use the Mesures dingbat face for decorative glyphs. */
+.font-ornament {
+  font-family: var(--font-ornament);
+}
+
+/* A manuscript flourish glyph (a Mesures dingbat) for chapter marks. */
+.flourish {
+  font-family: var(--font-ornament);
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--gold-soft);
+  user-select: none;
+  display: inline-block;
+  transform: translateY(-0.06em);
+}
+
+/* Ornamental divider: hairline — flourish — hairline. */
+.orchestration-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--gold-soft);
+}
+.orchestration-divider::before,
+.orchestration-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background-image: linear-gradient(
+    to var(--dir, right),
+    transparent,
+    var(--line-strong)
+  );
+}
+.orchestration-divider .flourish {
+  font-size: 0.9rem;
+}
+
+/* ================================================================== */
+/* Greek-inspired decorative language                                  */
+/* Subtle classical motifs: meander borders, ornamental diamonds,      */
+/* engraved rules, laurel accents, column line details.                */
+/* ================================================================== */
+
+/* Greek meander (key fret) border — a repeating geometric top rule. */
+.greek-meander {
+  --meander-color: var(--line-strong);
+  --meander-size: 14px;
+  height: var(--meander-size);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'><path d='M0 12h8V4h8v8h8V0' fill='none' stroke='%234e6c92' stroke-width='1.5'/></svg>");
+  background-repeat: repeat-x;
+  background-size: 28px 14px;
+  opacity: 0.35;
+}
+
+/* Small ornamental diamond — used inline between text or as separators. */
+.greek-diamond {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--gold-soft);
+  transform: rotate(45deg);
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+/* Classical chapter plate — a small numbered frame for chapter indices. */
+.chapter-plate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-raised);
+  font-family: var(--font-utility);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--engraving);
+  border-radius: var(--radius-xs);
+}
+
+/* Column-inspired vertical rule — a thin paired line like an Ionic column. */
+.column-rule {
+  position: relative;
+  width: 1px;
+  background: var(--line);
+}
+.column-rule::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+/* Laurel accent — a small pair of curved leaves flanking a mark. */
+.laurel-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gold-soft);
+}
+.laurel-accent::before,
+.laurel-accent::after {
+  content: "";
+  width: 12px;
+  height: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50% 0 50% 0;
+  opacity: 0.5;
+}
+.laurel-accent::after {
+  transform: scaleX(-1);
+}
+
+/* ================================================================== */
+/* Button press interaction                                            */
+/* Slight scale + vertical displacement + ink response, 150ms, no bounce.*/
+/* ================================================================== */
+.btn-press {
+  transition:
+    transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+.btn-press:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: inset 0 1px 3px rgba(31, 45, 64, 0.15);
+}
+
+/* ================================================================== */
+/* Hover interactions — desktop only, restrained.                      */
+/* ================================================================== */
+@media (hover: hover) and (pointer: fine) {
+  /* Engraving rule reveal on hover — a thin line slides in from the left. */
+  .hover-rule {
+    position: relative;
+  }
+  .hover-rule::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 220ms ease;
+  }
+  .hover-rule:hover::after {
+    width: 100%;
+  }
+
+  /* Subtle nav-item lift — 2px rise with color transition. */
+  .hover-lift {
+    transition:
+      transform 180ms ease,
+      color 180ms ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Small ornamental reveal — a diamond appears on hover. */
+  .hover-ornament {
+    position: relative;
+  }
+  .hover-ornament::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    background: var(--gold-soft);
+    transform: rotate(45deg) translateY(-50%) scale(0);
+    transition: transform 200ms ease;
+    opacity: 0.7;
+  }
+  .hover-ornament:hover::after {
+    transform: rotate(45deg) translateY(-50%) scale(1);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Engraved linework helpers                                           */
+/* ------------------------------------------------------------------ */
+
+/* Extending hairline rule (section separators). */
+.engraving-rule {
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    var(--line-strong) 22%,
+    var(--line-strong) 78%,
+    transparent
+  );
+}
+.engraving-rule::after {
+  content: "❧";
+  position: absolute;
+  right: 0;
+  transform: translateX(50%);
+  font-size: 0.65rem;
+  color: var(--gold-soft);
+  line-height: 1;
+}
+.engraving-rule {
+  position: relative;
+}
+
+/* Main content column. */
+.container-paideia {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-max);
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+/* Illustration plate — recessed well for page engravings. */
+.illustration-well {
+  position: relative;
+  border-radius: var(--illustration-radius);
+  border: 1px solid var(--illustration-border);
+  background-image: var(--illustration-bg), var(--paper-grain);
+  background-size: cover, 200px 200px;
+  box-shadow: var(--shadow-well);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Arch-top pediment frame for plate containers. */
+.arch-top::before,
+.arch-top::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  border: 1px solid var(--line-strong);
+  pointer-events: none;
+  border-radius: var(--radius-xs);
+}
+.arch-top::before {
+  top: -1px;
+  height: 2.4rem;
+  border-bottom: none;
+  border-radius: 999px 999px 0 0;
+}
+.arch-top::after {
+  top: 2.35rem;
+  bottom: -1px;
+  border-top: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Plate artwork treatment — print the engraving into the parchment.   */
+/* ------------------------------------------------------------------ */
+.engraving-blend {
+  mix-blend-mode: multiply;
+  /* Soft radial mask fades the rectangular edges into the page so there is
+     no hard image boundary; the engraved plate reads as pressed into paper. */
+  -webkit-mask-image: radial-gradient(
+    ellipse 96% 94% at 50% 48%,
+    #000 68%,
+    rgba(0, 0, 0, 0.86) 82%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 96% 94% at 50% 48%,
+    #000 68%,
+    rgba(0, 0, 0, 0.86) 82%,
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* ------------------------------------------------------------------ */
+/* ArtworkLayer blend + masks — dissolve the engraving into parchment. */
+/* The multiply blend lets the parchment grain show through so the art  */
+/* reads as printed on the page (not a pasted rectangle). The masks add */
+/* a soft outer taper on every edge plus a gentle fade on the side that */
+/* meets the content, while the engraved blue stays legible in the      */
+/* middle (no near-zero fade, no card shadow, no rounded border).       */
+/* ------------------------------------------------------------------ */
+.artwork-blend {
+  mix-blend-mode: multiply;
+}
+
+/* Art on the right (content on the left): soften all edges + fade left. */
+.artwork-mask {
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 134% 118% at 50% 50%,
+      #000 60%,
+      rgba(0, 0, 0, 0.86) 86%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.7) 12%,
+      #000 22%,
+      #000 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(
+      ellipse 134% 118% at 50% 50%,
+      #000 60%,
+      rgba(0, 0, 0, 0.86) 86%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.7) 12%,
+      #000 22%,
+      #000 100%
+    );
+  mask-composite: intersect;
+}
+
+/* Art on the left (content on the right): soften all edges + fade right. */
+.artwork-mask-left {
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 134% 118% at 50% 50%,
+      #000 60%,
+      rgba(0, 0, 0, 0.86) 86%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to left,
+      transparent 0%,
+      rgba(0, 0, 0, 0.7) 12%,
+      #000 22%,
+      #000 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(
+      ellipse 134% 118% at 50% 50%,
+      #000 60%,
+      rgba(0, 0, 0, 0.86) 86%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to left,
+      transparent 0%,
+      rgba(0, 0, 0, 0.7) 12%,
+      #000 22%,
+      #000 100%
+    );
+  mask-composite: intersect;
+}
+
+/* Full-bleed layer: soften only the outer rim, keep the centre crisp. */
+.artwork-mask-full {
+  -webkit-mask-image: radial-gradient(
+    ellipse 128% 118% at 50% 50%,
+    #000 62%,
+    rgba(0, 0, 0, 0.88) 88%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 128% 118% at 50% 50%,
+    #000 62%,
+    rgba(0, 0, 0, 0.88) 88%,
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* Art filling the lower band: soften edges + fade upward toward content. */
+.artwork-mask-bottom {
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 134% 118% at 50% 50%,
+      #000 60%,
+      rgba(0, 0, 0, 0.88) 88%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to top,
+      #000 62%,
+      rgba(0, 0, 0, 0.7) 84%,
+      transparent 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(
+      ellipse 134% 118% at 50% 50%,
+      #000 60%,
+      rgba(0, 0, 0, 0.88) 88%,
+      transparent 100%
+    ),
+    linear-gradient(
+      to top,
+      #000 62%,
+      rgba(0, 0, 0, 0.7) 84%,
+      transparent 100%
+    );
+  mask-composite: intersect;
+}
+
+/* ================================================================== */
+/* Chapter enter animation                                             */
+/* Content and artwork reveal gently when entering the viewport.       */
+/* Controlled by CSS custom properties written from IntersectionObserver.*/
+/* ================================================================== */
+.chapter-scene {
+  opacity: var(--ch-opacity, 1);
+  transform: translateY(var(--ch-ty, 0px)) scale(var(--ch-scale, 1));
+  will-change: opacity, transform;
+}
+
+/* Chapter numeral — subtle micro-animation when the chapter activates. */
+.chapter-numeral {
+  display: inline-block;
+  transition:
+    color 300ms ease,
+    letter-spacing 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.chapter-active .chapter-numeral {
+  color: var(--gold);
+  letter-spacing: 0.28em;
+}
+
+/* Ink fade on reveal — applied to chapter content blocks. */
+.ink-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.ink-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================================================== */
+/* Page-turn transition                                                */
+/* A brief, subtle parchment sweep when the active chapter changes.    */
+/* 350ms, directional, refined — not a dramatic 3D curl.               */
+/* ================================================================== */
+@keyframes page-turn-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-8%) skewX(-2deg);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(8%) skewX(2deg);
+  }
+}
+
+.page-turn {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(243, 238, 225, 0.55) 45%,
+    rgba(233, 226, 208, 0.7) 50%,
+    rgba(243, 238, 225, 0.55) 55%,
+    transparent 70%
+  );
+  animation: page-turn-sweep 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ================================================================== */
+/* Subtle progress-line animation                                      */
+/* ================================================================== */
+@keyframes progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.progress-animate {
+  transform-origin: left;
+  animation: progress-grow 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* ================================================================== */
+/* NIGHT MODE — a warm scholarly night.                               */
+/* One centralised override of the design tokens; every component      */
+/* that uses token utilities (bg-surface, text-ink, border-line, …)    */
+/* re-themes automatically. No scattered hardcoded dark values.        */
+/* Deep ink-blue ground, warm ivory text, muted blue, restrained gold. */
+/* ================================================================== */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Warm parchment → deep ink-blue ground. */
+  --parchment: #141b24;
+  --parchment-shade: #1b2431;
+  --parchment-deep: #263341;
+
+  /* Warm ivory text (never pure white; never harsh). */
+  --ink: #ece4d3; /* ~13.7:1 */
+  --ink-soft: #ccd6e2; /* ~11.8:1 */
+  --ink-faint: #94a3b6; /* ~6.7:1 */
+
+  /* Printed blues lifted for the dark ground. */
+  --ink-blue: #93aac9;
+  --ink-blue-soft: #a9bed8;
+  --engraving: #7f9dc4; /* ~6.2:1 — controls, focus, links */
+  --engraving-deep: #b3c8e4; /* emphasised text */
+  --engraving-soft: #6e88a8;
+  --engraving-faint: #46566b;
+
+  /* Antique gold, warmed and lifted. */
+  --gold: #c6a15c; /* ~7.1:1 */
+  --gold-soft: #b69a63;
+
+  /* Softer, readable borders — no harsh white hairlines. */
+  --line: rgba(150, 170, 195, 0.16);
+  --line-strong: rgba(150, 170, 195, 0.32);
+  --line-ink: rgba(236, 228, 211, 0.2);
+
+  /* Semantic tokens tuned for dark. */
+  --success: #6fcf9b;
+  --warning: #e0b06a;
+  --danger: #e08a7a;
+
+  /* Paper tiers become ink tiers. */
+  --surface: #1b2431;
+  --surface-raised: #212c3a;
+  --surface-sunken: #10161e;
+  --surface-engraving: #1a2430;
+
+  --scrim: rgba(3, 7, 12, 0.62);
+
+  --shadow-card:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 6px 20px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 14px 34px rgba(0, 0, 0, 0.5);
+  --shadow-well:
+    inset 0 1px 2px rgba(0, 0, 0, 0.55),
+    inset 0 10px 24px rgba(0, 0, 0, 0.35);
+
+  --illustration-bg:
+    radial-gradient(120% 90% at 50% 0%, #1c2634 0%, var(--surface-sunken) 100%);
+
+  --paper-base: #12181f;
+  --paper-vignette: radial-gradient(
+    120% 110% at 50% 38%,
+    rgba(0, 0, 0, 0) 52%,
+    rgba(0, 0, 0, 0.35) 82%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+/* Night artwork treatment — an illuminated plate, not an inverted image.
+   The engraving is retained as ink lines that gently *glow* into the dark
+   ground: the light paper ground is darkened and screened back so only the
+   etched linework lifts off the page, then softened with the same feathered
+   mask used in light mode. No global invert/brightness filter on the page,
+   no heavy card border. */
+html[data-theme="dark"] .artwork-blend,
+html[data-theme="dark"] .engraving-blend {
+  mix-blend-mode: screen;
+  filter: invert(1) sepia(0.2) saturate(0.85) brightness(0.62) contrast(1.08);
+  opacity: 0.9;
+}
+
+/* Night page-turn — a deep vellum sweep instead of a bright parchment flash. */
+html[data-theme="dark"] .page-turn {
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(70, 92, 122, 0.4) 45%,
+    rgba(120, 146, 179, 0.5) 50%,
+    rgba(70, 92, 122, 0.4) 55%,
+    transparent 70%
+  );
+}
+
+/* ================================================================== */
+/* Reduced motion — collapse all decorative motion to plain fades.     */
+/* ================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .chapter-scene {
+    transform: none !important;
+    transition: opacity 0.01ms !important;
+  }
+  .ink-reveal {
+    transform: none !important;
+  }
+  .page-turn {
+    animation-duration: 0.01ms !important;
+  }
+  .progress-animate {
+    animation: none !important;
+    transform: none !important;
+  }
+  .chapter-numeral {
+    transition: color 0.01ms !important;
+  }
+  .btn-press:active {
+    transform: none !important;
+  }
+  .hover-lift:hover {
+    transform: none !important;
+  }
+}
+
+/* ================================================================== */
+/* Rich-text summary editor (reading workspace)                        */
+/* ================================================================== */
+.editor-content {
+  font-family: var(--font-body);
+  color: var(--ink);
+  line-height: 1.75;
+}
+.editor-content:focus,
+.editor-content:focus-visible {
+  outline: none;
+}
+.editor-content > * + * {
+  margin-top: 0.75rem;
+}
+.editor-content h2 {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.editor-content h3 {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.editor-content ul,
+.editor-content ol {
+  padding-left: 1.4rem;
+}
+.editor-content ul {
+  list-style: disc;
+}
+.editor-content ol {
+  list-style: decimal;
+}
+.editor-content blockquote {
+  border-left: 2px solid var(--line-strong);
+  padding-left: 1rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.editor-content code {
+  font-family: var(--font-utility);
+  font-size: 0.85em;
+  background: var(--surface-sunken);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-xs);
+}
+.editor-content pre {
+  font-family: var(--font-utility);
+  background: var(--surface-sunken);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+.editor-content pre code {
+  background: transparent;
+  padding: 0;
+}
+.editor-content a {
+  color: var(--engraving);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--ink-faint);
+}
+
+/* Theme-safe highlight tones and text colours (tokens, never arbitrary). */
+.hl {
+  border-radius: var(--radius-xs);
+  padding: 0 0.12em;
+}
+.hl-gold {
+  background-color: rgba(125, 99, 53, 0.2);
+}
+.hl-blue {
+  background-color: rgba(88, 118, 157, 0.2);
+}
+.hl-green {
+  background-color: rgba(94, 124, 86, 0.22);
+}
+.hl-rose {
+  background-color: rgba(150, 92, 92, 0.18);
+}
+.c-blue {
+  color: #3f5f85;
+}
+.c-gold {
+  color: #6f5628;
+}
+.c-ink {
+  color: var(--ink);
+}
+.c-soft {
+  color: var(--ink-soft);
+}
+html[data-theme="dark"] .hl-gold {
+  background-color: rgba(200, 170, 110, 0.22);
+}
+html[data-theme="dark"] .hl-blue {
+  background-color: rgba(120, 150, 190, 0.26);
+}
+html[data-theme="dark"] .hl-green {
+  background-color: rgba(130, 165, 120, 0.22);
+}
+html[data-theme="dark"] .hl-rose {
+  background-color: rgba(190, 130, 130, 0.22);
+}
+html[data-theme="dark"] .c-blue {
+  color: #a6c1e0;
+}
+html[data-theme="dark"] .c-gold {
+  color: #dcc188;
+}
