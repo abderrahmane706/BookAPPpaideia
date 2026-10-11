@@ -11,6 +11,7 @@ import { NotesPanel } from "./NotesPanel";
 import { QuotesPanel } from "./QuotesPanel";
 import { ReviewPanel } from "./ReviewPanel";
 import { ActivityPanel } from "./ActivityPanel";
+import { MindMapPanel } from "@/components/mind-map";
 
 const SECTIONS = [
   { id: "overview", index: "01", label: "Overview" },
@@ -18,7 +19,8 @@ const SECTIONS = [
   { id: "notes", index: "03", label: "Notes" },
   { id: "quotes", index: "04", label: "Highlights" },
   { id: "review", index: "05", label: "Review" },
-  { id: "activity", index: "06", label: "Activity" },
+  { id: "mindmap", index: "06", label: "Mind Map" },
+  { id: "activity", index: "07", label: "Activity" },
 ];
 
 export interface BookWorkspaceProps {
@@ -123,8 +125,17 @@ export function BookWorkspace({ bookId }: BookWorkspaceProps) {
         </WorkspaceSection>
 
         <WorkspaceSection
-          id="activity"
+          id="mindmap"
           index="06"
+          title="Mind Map"
+          description="Sketch the book's ideas as nodes you can arrange, connect and refine."
+        >
+          <MindMapPanel bookId={book.id} />
+        </WorkspaceSection>
+
+        <WorkspaceSection
+          id="activity"
+          index="07"
           title="Reading Activity"
           description="A quiet ledger of the time you have spent with this book."
         >

@@ -19,7 +19,9 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center rounded-radius-lg border border-dashed border-line-strong bg-parchment-shade/40 px-6 py-12 text-center">
       {glyph ? <div className="mb-4 text-engraving/50">{glyph}</div> : null}
-      <h3 className="font-display text-lg font-semibold text-ink">{title}</h3>
+      <h3 className="font-editorial text-lg font-semibold tracking-tight text-ink">
+        {title}
+      </h3>
       {description ? (
         <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-ink-soft">
           {description}

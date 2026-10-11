@@ -1,4 +1,5 @@
 import type { Book } from "@/lib/types/book";
+import type { MindMap } from "@/lib/types/mindmap";
 import type { Note, Quote, ReadingSession, Summary } from "@/lib/types/library";
 
 /**
@@ -32,6 +33,8 @@ export interface LibrarySnapshot {
   notes: Note[];
   quotes: Quote[];
   sessions: ReadingSession[];
+  /** Mind maps, flat list. A book may own many; a map belongs to one book. */
+  mindMaps: MindMap[];
 }
 
 export const EMPTY_SNAPSHOT: LibrarySnapshot = {
@@ -40,6 +43,7 @@ export const EMPTY_SNAPSHOT: LibrarySnapshot = {
   notes: [],
   quotes: [],
   sessions: [],
+  mindMaps: [],
 };
 
 /** True when running in a browser with a usable localStorage. */
@@ -74,7 +78,8 @@ export function normaliseSnapshot(raw: unknown): LibrarySnapshot | null {
   const summaries = isRecord(raw.summaries)
     ? (raw.summaries as Record<string, Summary>)
     : {};
-  return { books, summaries, notes, quotes, sessions };
+  const mindMaps = Array.isArray(raw.mindMaps) ? (raw.mindMaps as MindMap[]) : [];
+  return { books, summaries, notes, quotes, sessions, mindMaps };
 }
 
 export function loadSnapshot(): LibrarySnapshot | null {

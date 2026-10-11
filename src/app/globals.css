@@ -57,6 +57,60 @@
   --surface-sunken: #eae4d2; /* wells, recessed zones */
   --surface-engraving: #eef0ed; /* cool blue-tinted plate surfaces */
 
+  /* ------------------------------------------------------------------
+     STONE — a restrained limestone family.
+     Classical architecture reads through *material*, not ornament: a
+     pale, chalky neutral that sits quietly beside the warm parchment.
+     It is used for carved separators, chapter plates, quiet panels and
+     the frames around engraved plates — never as a large flat field.
+     ------------------------------------------------------------------ */
+  --stone: #e7e5dd;
+  --stone-soft: #efeee8; /* lit face of a carved edge */
+  --stone-deep: #d3d0c5; /* shaded face / groove */
+  --stone-line: #c3bfb2; /* stone hairline */
+  --stone-shadow: rgba(38, 44, 54, 0.12);
+  --stone-highlight: rgba(255, 255, 255, 0.65);
+
+  /* ------------------------------------------------------------------
+     MIND-MAP NODE PALETTE
+     Curated, theme-aware colour tokens. Nodes/edges store a *token id*
+     (e.g. "blue", "sage") and resolve to these variables, so a mind map
+     re-themes for night mode with zero stored colour duplication.
+     ------------------------------------------------------------------ */
+  /* Fills */
+  --mmc-fill-parchment: #f3eee1;
+  --mmc-fill-ivory: #faf6ec;
+  --mmc-fill-blue: #dbe6f4;
+  --mmc-fill-pale: #e7edf5;
+  --mmc-fill-slate: #e2e5ea;
+  --mmc-fill-gold: #f0e6cf;
+  --mmc-fill-sage: #e0e8da;
+  --mmc-fill-terracotta: #f1e0d6;
+  /* Text on nodes */
+  --mmc-text-ink: #16448a;
+  --mmc-text-soft: #3c5f8e;
+  --mmc-text-blue: #245fbd;
+  --mmc-text-gold: #6b5220;
+  --mmc-text-green: #3b6446;
+  --mmc-text-rose: #823f34;
+  --mmc-text-surface: #faf6ec;
+  /* Borders + edges */
+  --mmc-border-ink: #1a54a5;
+  --mmc-border-blue: #5188cf;
+  --mmc-border-slate: #7a8798;
+  --mmc-border-gold: #a2823f;
+  --mmc-border-sage: #6f9a72;
+  --mmc-border-terracotta: #bc6b4a;
+  --mmc-border-faint: #b3bfcf;
+
+  /* Mind-map chrome (canvas, panels, handles) */
+  --mm-canvas: #ece7da;
+  --mm-canvas-dot: rgba(48, 62, 82, 0.13);
+  --mm-panel: var(--surface-raised);
+  --mm-panel-line: var(--line-strong);
+  --mm-handle: var(--engraving);
+  --mm-handle-ring: var(--surface-raised);
+
   /* Radii — restrained, editorial (avoid pill/SaaS rounding). */
   --radius-xs: 2px;
   --radius-sm: 4px;
@@ -162,6 +216,7 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-utility: var(--font-utility);
+  --font-editorial: var(--font-editorial);
 
   --shadow-card: var(--shadow-card);
   --shadow-card-hover: var(--shadow-card-hover);
@@ -464,6 +519,145 @@ body {
 }
 .laurel-accent::after {
   transform: scaleX(-1);
+}
+
+/* ================================================================== */
+/* Stone language — carved, material, restrained.                      */
+/* Classical identity is carried by *material* (limestone surfaces,    */
+/* incised separators, relief frames) rather than applied ornament.    */
+/* Used sparingly for plates, quiet panels and section seams only.     */
+/* ================================================================== */
+
+/* Editorial typeface — Cormorant Garamond. Sits between the Didot      */
+/* display face and the Source Serif body for card/section titles.      */
+.font-editorial {
+  font-family: var(--font-editorial), "Cormorant Garamond", Georgia, serif;
+  font-synthesis: none;
+}
+
+/* Limestone surface — a faint, layered chalk wash. Never a flat grey. */
+.stone-surface {
+  background-color: var(--stone);
+  background-image:
+    radial-gradient(
+      130% 100% at 18% 0%,
+      color-mix(in srgb, var(--stone-soft) 85%, transparent) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      120% 90% at 92% 100%,
+      color-mix(in srgb, var(--stone-deep) 70%, transparent) 0%,
+      transparent 60%
+    );
+}
+
+/* Incised (carved-in) separator — a groove, not a printed rule: a dark
+   hairline sitting under a lit one so the stone reads as cut. */
+.carved-separator {
+  height: 0;
+  border: 0;
+  border-top: 1px solid var(--stone-line);
+  box-shadow: 0 1px 0 var(--stone-highlight);
+}
+
+/* Carved separator with a centred folio lozenge. */
+.carved-separator-marked {
+  position: relative;
+  height: 1px;
+  border: 0;
+  margin-block: 1.5rem;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--stone-line) 18%,
+    var(--stone-line) 82%,
+    transparent
+  );
+  box-shadow: 0 1px 0 var(--stone-highlight);
+}
+.carved-separator-marked::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--stone);
+  border: 1px solid var(--stone-line);
+  box-shadow: inset 0 1px 0 var(--stone-highlight);
+}
+
+/* Relief frame — a restrained architectural border: an incised outer
+   line with a lit inner face, plus small corner nicks. */
+.relief-frame {
+  position: relative;
+  border: 1px solid var(--stone-line);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    inset 0 1px 0 var(--stone-highlight),
+    inset 0 -1px 0 var(--stone-shadow),
+    0 1px 0 var(--stone-highlight);
+}
+.relief-frame::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid color-mix(in srgb, var(--stone-line) 55%, transparent);
+  border-radius: calc(var(--radius-sm) - 2px);
+  pointer-events: none;
+}
+
+/* Architectural corner brackets — thin L-marks in each corner of a frame. */
+.corner-brackets {
+  position: relative;
+}
+.corner-brackets::before,
+.corner-brackets::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--stone-line);
+  pointer-events: none;
+}
+.corner-brackets::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.corner-brackets::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+/* Stone chapter plate — an incised numbered tablet. */
+.stone-plate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.45rem;
+  border: 1px solid var(--stone-line);
+  border-radius: var(--radius-xs);
+  background-color: var(--stone);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--stone-soft) 80%, transparent),
+    transparent 70%
+  );
+  box-shadow:
+    inset 0 1px 0 var(--stone-highlight),
+    inset 0 -1px 0 var(--stone-shadow);
+  font-family: var(--font-utility);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--engraving);
 }
 
 /* ================================================================== */
@@ -895,6 +1089,43 @@ html[data-theme="dark"] {
   --surface-sunken: #10161e;
   --surface-engraving: #1a2430;
 
+  /* Stone — a cool basalt in the dark; the carved edge still reads. */
+  --stone: #26313f;
+  --stone-soft: #2c3848;
+  --stone-deep: #1a2431;
+  --stone-line: #39485b;
+  --stone-shadow: rgba(0, 0, 0, 0.5);
+  --stone-highlight: rgba(180, 200, 224, 0.08);
+
+  /* Mind-map palette lifted for the dark ground. */
+  --mmc-fill-parchment: #1f2a37;
+  --mmc-fill-ivory: #242f3e;
+  --mmc-fill-blue: #223650;
+  --mmc-fill-pale: #1e2b3c;
+  --mmc-fill-slate: #2a3340;
+  --mmc-fill-gold: #3a311f;
+  --mmc-fill-sage: #24332a;
+  --mmc-fill-terracotta: #3a2924;
+  --mmc-text-ink: #ece4d3;
+  --mmc-text-soft: #c2cfe0;
+  --mmc-text-blue: #b3c8e4;
+  --mmc-text-gold: #d8b878;
+  --mmc-text-green: #9ecfa8;
+  --mmc-text-rose: #e3a99b;
+  --mmc-text-surface: #141b24;
+  --mmc-border-ink: #7f9dc4;
+  --mmc-border-blue: #5188cf;
+  --mmc-border-slate: #8095ad;
+  --mmc-border-gold: #c6a15c;
+  --mmc-border-sage: #7fae86;
+  --mmc-border-terracotta: #d09a7c;
+  --mmc-border-faint: #46566b;
+
+  --mm-canvas: #0e141c;
+  --mm-canvas-dot: rgba(150, 170, 195, 0.16);
+  --mm-handle: #7f9dc4;
+  --mm-handle-ring: #1b2431;
+
   --scrim: rgba(3, 7, 12, 0.62);
 
   --shadow-card:
@@ -1093,4 +1324,151 @@ html[data-theme="dark"] .c-blue {
 }
 html[data-theme="dark"] .c-gold {
   color: #dcc188;
+}
+
+/* ================================================================== */
+/* MIND MAP — React Flow theme layer                                   */
+/* React Flow reads --xy-* variables from the flow container, so we    */
+/* scope an override to `.paideia-flow` and drive it from PAIDEIA      */
+/* tokens; night mode then re-themes for free.                         */
+/* ================================================================== */
+.paideia-flow {
+  --xy-background-color: var(--mm-canvas);
+  --xy-edge-stroke-default: var(--mmc-border-ink);
+  --xy-edge-stroke: var(--mmc-border-ink);
+  --xy-edge-stroke-width-default: 1.5;
+  --xy-edge-stroke-selected-default: var(--engraving-deep);
+  --xy-connectionline-stroke-default: var(--engraving);
+  --xy-connectionline-stroke-width-default: 2;
+  --xy-handle-background-color-default: var(--mm-handle);
+  --xy-handle-border-color-default: var(--mm-handle-ring);
+  --xy-selection-background-color-default: color-mix(
+    in srgb,
+    var(--engraving) 12%,
+    transparent
+  );
+  --xy-selection-border-default: 1px dashed var(--engraving);
+  --xy-attribution-background-color-default: transparent;
+  --xy-node-border-radius: var(--radius-md);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.paideia-flow .react-flow__attribution {
+  background: transparent;
+  font-size: 9px;
+}
+.paideia-flow .react-flow__attribution a {
+  color: var(--ink-faint);
+}
+
+/* Handles — visible targets in both themes; larger hit area on touch. */
+.paideia-flow .react-flow__handle {
+  width: 9px;
+  height: 9px;
+  border-width: 2px;
+  background: var(--mm-handle);
+  transition: transform 120ms ease;
+}
+.paideia-flow .react-flow__handle:hover {
+  transform: scale(1.35);
+}
+
+/* Edge interaction + label. */
+.paideia-flow .react-flow__edge-path {
+  transition: stroke 120ms ease;
+}
+.paideia-flow .react-flow__edge.selected .react-flow__edge-path,
+.paideia-flow .react-flow__edge:focus-visible .react-flow__edge-path {
+  stroke: var(--engraving-deep);
+  stroke-width: 2.25;
+}
+.paideia-flow .react-flow__edge-text {
+  font-family: var(--font-utility);
+  font-size: 10px;
+  fill: var(--ink-soft);
+}
+.paideia-flow .react-flow__edge-textbg {
+  fill: var(--surface-raised);
+}
+
+/* Panels, controls, minimap. */
+.paideia-flow .react-flow__controls {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.paideia-flow .react-flow__controls-button {
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  fill: currentColor;
+}
+.paideia-flow .react-flow__controls-button:hover {
+  background: var(--surface);
+  color: var(--engraving-deep);
+}
+.paideia-flow .react-flow__minimap {
+  background: var(--surface-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.paideia-flow .react-flow__minimap-mask {
+  fill: color-mix(in srgb, var(--engraving) 14%, transparent);
+}
+
+/* A mind-map node wrapper: selected/hover affordance. */
+.mm-node {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-family: var(--font-body);
+  box-shadow: var(--shadow-card);
+  transition:
+    box-shadow 140ms ease,
+    outline-color 140ms ease;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.mm-node:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+.mm-node.is-selected {
+  outline-color: var(--engraving);
+}
+.mm-node__type {
+  font-family: var(--font-utility);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.mm-node__title {
+  line-height: 1.25;
+  word-break: break-word;
+}
+.mm-node__body {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  opacity: 0.9;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.mm-node__icon {
+  margin-right: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paideia-flow .react-flow__handle,
+  .paideia-flow .react-flow__edge-path,
+  .mm-node {
+    transition: none !important;
+  }
 }

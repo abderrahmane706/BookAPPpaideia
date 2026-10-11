@@ -1,45 +1,83 @@
 /**
- * Mind Map domain boundary — persistence-oriented.
+ * Mind Map domain boundary.
  *
- * The mind-map editor is a later phase. This boundary models the *persistent
- * data* (maps, nodes, edges) so the future editor plugs into existing
- * architecture rather than requiring a rewrite. UI/rendering concerns are not
- * defined here.
+ * Persistence lives in the single app-wide library store (one source of truth,
+ * with cross-tab sync); this module is the domain surface the mind-map UI talks
+ * to: defaults, templates, layout, validation, serialization and exports.
  */
 
-export interface MindMapNode {
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-  /** Semantic importance, for later ranking/rendering. */
-  importance: "low" | "medium" | "high";
-  color: string;
-  /** Optional free-form text body shown on the card. */
-  body?: string;
-}
+export * from "@/lib/types/mindmap";
 
-export interface MindMapEdge {
-  id: string;
-  sourceId: string;
-  targetId: string;
-  /** Optional relationship label. */
-  label?: string;
-}
+export {
+  BASE_NODE_STYLE,
+  DEFAULT_VIEWPORT,
+  NODE_KIND_STYLE,
+  clampFontSize,
+  createDefaultMap,
+  createEdge,
+  createNode,
+  mindMapUid,
+  styleForKind,
+} from "./defaults";
 
-export interface MindMap {
-  id: string;
-  /** Scoped to an optional book, or a free-standing map. */
-  bookId?: string;
-  title: string;
-  nodes: MindMapNode[];
-  edges: MindMapEdge[];
-  updatedAt: string;
-}
+export { MIND_MAP_TEMPLATES, getTemplate, type MindMapTemplate } from "./templates";
 
-/** Persistence boundary for maps. */
-export interface MindMapService {
-  getMap(id: string): Promise<MindMap | null>;
-  listMaps(bookId?: string): Promise<MindMap[]>;
-  saveMap(map: MindMap): Promise<MindMap>;
-}
+export { arrangeNodes } from "./layout";
+
+export {
+  MIND_MAP_MAX_EDGES,
+  MIND_MAP_MAX_NODES,
+  MIND_MAP_MAX_JSON_BYTES,
+  parseMindMapJson,
+  sanitizeEdge,
+  sanitizeGraph,
+  sanitizeNode,
+  sanitizeNodeStyle,
+  sanitizeViewport,
+  type ImportResult,
+  type SanitizedGraph,
+} from "./validation";
+
+export { deserializeMindMap, mindMapExport, serializeMindMap } from "./serialization";
+
+export {
+  buildMindMapSvg,
+  downloadMindMapJson,
+  downloadMindMapPng,
+  downloadMindMapSvg,
+  type SvgDocument,
+} from "./export";
+
+export {
+  useMindMap,
+  useMindMapReady,
+  useMindMapSnapshot,
+  useMindMaps,
+} from "./hooks";
+
+import { library } from "@/lib/services/library/store";
+import type { MindMap, MindMapEdge, MindMapNode, MindMapViewport } from "@/lib/types/mindmap";
+
+/**
+ * Thin service facade over the shared store, so UI code has a single,
+ * intention-revealing API and never reaches into storage directly.
+ */
+export const mindMapService = {
+  list: (bookId: string): MindMap[] => library.listMindMaps(bookId),
+  get: (id: string | null | undefined): MindMap | null => library.getMindMap(id),
+  create: (
+    bookId: string,
+    options: { title?: string; templateId?: string } = {},
+  ): MindMap | null => library.createMindMap(bookId, options),
+  update: (
+    id: string,
+    patch: Partial<{
+      title: string;
+      nodes: MindMapNode[];
+      edges: MindMapEdge[];
+      viewport: MindMapViewport;
+    }>,
+  ): MindMap | null => library.updateMindMap(id, patch),
+  remove: (id: string): boolean => library.deleteMindMap(id),
+  duplicate: (id: string): MindMap | null => library.duplicateMindMap(id),
+};

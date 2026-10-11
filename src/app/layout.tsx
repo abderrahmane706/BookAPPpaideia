@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import {
+  Cormorant_Garamond,
   GFS_Didot,
   Public_Sans,
   Source_Serif_4,
@@ -15,6 +16,17 @@ const display = GFS_Didot({
   subsets: ["greek", "latin"],
   weight: "400",
   style: "normal",
+  display: "swap",
+});
+
+// Classical editorial serif — used for editorial titles (section leads, book
+// titles, card headings) where Didot would be too austere. Sits between the
+// display face and the serif body in the typographic hierarchy.
+const editorial = Cormorant_Garamond({
+  variable: "--font-editorial",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -66,7 +78,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${display.variable} ${body.variable} ${utility.variable} ${ornament.variable} ${body.className} h-full`}
+      className={`${display.variable} ${body.variable} ${utility.variable} ${ornament.variable} ${editorial.variable} ${body.className} h-full`}
     >
       <head>
         {/* Resolve the theme before first paint to avoid a flash of the wrong

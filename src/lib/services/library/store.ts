@@ -16,6 +16,14 @@ import type {
   RichTextDoc,
   Summary,
 } from "@/lib/types/library";
+import {
+  MIND_MAP_VERSION,
+  type MindMap,
+  type MindMapEdge,
+  type MindMapNode,
+} from "@/lib/types/mindmap";
+import { createDefaultMap } from "@/lib/services/mindmap/defaults";
+import { getTemplate } from "@/lib/services/mindmap/templates";
 import { LIBRARY_STORAGE_KEY } from "./persistence";
 import {
   EMPTY_SNAPSHOT,
@@ -353,6 +361,7 @@ class LibraryStore {
       notes: this.state.notes.filter((n) => n.bookId !== id),
       quotes: this.state.quotes.filter((q) => q.bookId !== id),
       sessions: this.state.sessions.filter((s) => s.bookId !== id),
+      mindMaps: this.state.mindMaps.filter((m) => m.bookId !== id),
     });
     return true;
   }
@@ -554,6 +563,116 @@ class LibraryStore {
       sessions: this.state.sessions.filter((s) => s.id !== id),
     });
     return true;
+  }
+
+  /* ----- mind maps ----- */
+
+  listMindMaps(bookId: string): MindMap[] {
+    return this.state.mindMaps
+      .filter((m) => m.bookId === bookId)
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  }
+
+  getMindMap(id: string | null | undefined): MindMap | null {
+    if (!id) return null;
+    return this.state.mindMaps.find((m) => m.id === id) ?? null;
+  }
+
+  /**
+   * Create a map for a book. Always starts from the default graph (a single
+   * central node) unless a template is named. A map can only be created for a
+   * book that exists — never orphaned.
+   */
+  createMindMap(
+    bookId: string,
+    options: { title?: string; templateId?: string } = {},
+  ): MindMap | null {
+    if (!this.getBook(bookId)) return null;
+    const template = options.templateId ? getTemplate(options.templateId) : null;
+    const graph = template ? template.build() : null;
+    const base = createDefaultMap(
+      uid("map"),
+      bookId,
+      options.title?.trim() || template?.name || "Untitled map",
+    );
+    const at = nowIso();
+    const map: MindMap = {
+      ...base,
+      title: options.title?.trim() || template?.name || "Untitled map",
+      nodes: graph?.nodes ?? base.nodes,
+      edges: graph?.edges ?? base.edges,
+      createdAt: at,
+      updatedAt: at,
+    };
+    this.commit({ ...this.state, mindMaps: [map, ...this.state.mindMaps] });
+    return map;
+  }
+
+  updateMindMap(
+    id: string,
+    patch: Partial<Pick<MindMap, "title" | "nodes" | "edges" | "viewport">>,
+  ): MindMap | null {
+    const existing = this.getMindMap(id);
+    if (!existing) return null;
+    const updated: MindMap = {
+      ...existing,
+      title:
+        patch.title !== undefined && patch.title.trim().length > 0
+          ? patch.title.trim()
+          : existing.title,
+      nodes: patch.nodes ?? existing.nodes,
+      edges: patch.edges ?? existing.edges,
+      viewport: patch.viewport ?? existing.viewport,
+      version: MIND_MAP_VERSION,
+      updatedAt: nowIso(),
+    };
+    this.commit({
+      ...this.state,
+      mindMaps: this.state.mindMaps.map((m) => (m.id === id ? updated : m)),
+    });
+    return updated;
+  }
+
+  deleteMindMap(id: string): boolean {
+    if (!this.state.mindMaps.some((m) => m.id === id)) return false;
+    this.commit({
+      ...this.state,
+      mindMaps: this.state.mindMaps.filter((m) => m.id !== id),
+    });
+    return true;
+  }
+
+  /** Deep-copy a map with fresh node/edge ids. */
+  duplicateMindMap(id: string): MindMap | null {
+    const existing = this.getMindMap(id);
+    if (!existing) return null;
+    const idMap = new Map<string, string>();
+    const nodes: MindMapNode[] = existing.nodes.map((node) => {
+      const nextId = uid("mn");
+      idMap.set(node.id, nextId);
+      return { ...node, id: nextId };
+    });
+    const edges: MindMapEdge[] = existing.edges
+      .map((edge) => {
+        const source = idMap.get(edge.source);
+        const target = idMap.get(edge.target);
+        if (!source || !target) return null;
+        return { ...edge, id: uid("me"), source, target };
+      })
+      .filter((edge): edge is MindMapEdge => edge !== null);
+    const at = nowIso();
+    const copy: MindMap = {
+      ...existing,
+      id: uid("map"),
+      title: `${existing.title} (copy)`,
+      nodes,
+      edges,
+      viewport: { ...existing.viewport },
+      createdAt: at,
+      updatedAt: at,
+    };
+    this.commit({ ...this.state, mindMaps: [copy, ...this.state.mindMaps] });
+    return copy;
   }
 
   /* ----- import / replace (used by dataset for future sync) ----- */

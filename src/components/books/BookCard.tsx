@@ -60,7 +60,7 @@ export function BookCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-3.5">
-        <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug text-ink">
+        <h3 className="line-clamp-2 font-editorial text-base font-semibold leading-snug tracking-tight text-ink">
           {book.title}
         </h3>
         <p className="truncate font-utility text-xs uppercase tracking-[0.12em] text-ink-soft">
