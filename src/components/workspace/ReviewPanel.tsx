@@ -3,34 +3,45 @@
 import { useState } from "react";
 import type { Book, StarRating } from "@/lib/types/book";
 import { library } from "@/lib/services/library";
+import { queueReflection } from "@/lib/services/review";
 import { SoundManager } from "@/lib/services/sound/SoundManager";
 import { StarRatingInput } from "@/components/books/StarRatingInput";
 import { notify } from "@/components/ui/feedback";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
+import { QueueForReviewButton } from "@/components/agora";
 
 const PROMPTS: Array<{
   key: "personalReview" | "keyTakeaway" | "mostImportantIdea" | "personalApplication";
+  source:
+    | "personal_review"
+    | "key_takeaway"
+    | "most_important_idea"
+    | "personal_application";
   label: string;
   hint: string;
 }> = [
   {
     key: "personalReview",
+    source: "personal_review",
     label: "Personal review",
     hint: "What did this book teach you?",
   },
   {
     key: "keyTakeaway",
+    source: "key_takeaway",
     label: "Key takeaway",
     hint: "The lesson you would carry forward.",
   },
   {
     key: "mostImportantIdea",
+    source: "most_important_idea",
     label: "Most important idea",
     hint: "The argument in a sentence, in your own words.",
   },
   {
     key: "personalApplication",
+    source: "personal_application",
     label: "Personal application",
     hint: "Where this reading meets your life.",
   },
@@ -100,6 +111,15 @@ export function ReviewPanel({ book }: ReviewPanelProps) {
               onChange={(event) => update(prompt.key, event.target.value)}
               className="mt-1"
             />
+            {(book[prompt.key] ?? "").trim().length > 0 ? (
+              <div className="mt-1.5 flex justify-end">
+                <QueueForReviewButton
+                  sourceType={prompt.source}
+                  sourceId={book.id}
+                  onQueue={() => queueReflection(book, prompt.source)}
+                />
+              </div>
+            ) : null}
           </li>
         ))}
       </ul>

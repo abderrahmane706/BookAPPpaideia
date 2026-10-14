@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 import { AnimatedChapterNumber } from "./AnimatedChapterNumber";
 import { GreekRule } from "@/components/ui/GreekRule";
+import { TextReveal } from "@/components/ui/TextReveal";
 
 export interface ChapterContentProps {
   /** Two-digit index rendered as a small plate, e.g. "01". */
@@ -46,14 +47,14 @@ export function ChapterContent({
         {label}
       </p>
 
-      <h2
+      <TextReveal
+        as="h2"
+        text={title}
         className={cn(
           "font-display font-semibold text-ink",
           titleClassName ?? "heading-chapter",
         )}
-      >
-        {title}
-      </h2>
+      />
 
       {description ? (
         <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-soft">

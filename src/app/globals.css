@@ -386,7 +386,37 @@ body {
 }
 .heading-section {
   font-size: var(--text-section);
-  line-height: 1.2;
+  line-height: 1.16;
+  letter-spacing: -0.004em;
+}
+
+/* Refined classical typography
+   ------------------------------------------------------------------
+   Balanced heading wraps (no orphan words on a line of their own),
+   pretty paragraph rag, sensible long-form measures and enabled
+   kerning/ligatures. All additive — existing sizes/leading are kept. */
+.heading-display,
+.heading-chapter,
+.heading-section {
+  text-wrap: balance;
+}
+p,
+li,
+figcaption,
+blockquote {
+  text-wrap: pretty;
+}
+/* Long-form reading measure (~66–72 characters per line). */
+.measure {
+  max-width: 68ch;
+}
+.measure-narrow {
+  max-width: 52ch;
+}
+body {
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures contextual;
+  font-optical-sizing: auto;
 }
 /* Lead paragraph under a display heading. */
 .lead {
@@ -902,6 +932,34 @@ body {
       #000 100%
     );
   mask-composite: intersect;
+}
+
+/* ================================================================== */
+/* TextReveal — word-by-word ink-in for short display copy.            */
+/* Words rise a few px and fade in with a short stagger; runs once on  */
+/* viewport entry. Collapses to a plain fade under reduced motion.     */
+/* ================================================================== */
+.text-reveal__word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.34em);
+  transition:
+    opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 560ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--tr-delay, 0ms);
+  will-change: opacity, transform;
+}
+.text-reveal.is-visible .text-reveal__word {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .text-reveal__word {
+    transition: none !important;
+    transition-delay: 0ms !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* Full-bleed layer: soften only the outer rim, keep the centre crisp. */
@@ -1470,5 +1528,464 @@ html[data-theme="dark"] .c-gold {
   .paideia-flow .react-flow__edge-path,
   .mm-node {
     transition: none !important;
+  }
+}
+
+/* ================================================================== */
+/* CLASSICAL CONTROLS — refined button detailing                       */
+/* Carved primary, ornamental underline on secondary, quiet editorial  */
+/* text actions. All feedback is short (~120–200ms) and colour/opacity  */
+/* driven; motion is a single restrained press on :active.             */
+/* ================================================================== */
+
+/* Primary — a fine carved inner border that surfaces antique gold on
+   hover / keyboard focus. Purely decorative; never affects contrast. */
+.btn-carved {
+  position: relative;
+}
+.btn-carved::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid color-mix(in srgb, var(--gold) 60%, transparent);
+  border-radius: calc(var(--radius-sm) - 2px);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  pointer-events: none;
+}
+.btn-carved:hover::after,
+.btn-carved:focus-visible::after {
+  opacity: 0.75;
+}
+
+/* Secondary — parchment surface with a centred ornamental underline that
+   inks outward from the middle on hover / focus. */
+.btn-parchment {
+  position: relative;
+}
+.btn-parchment::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  height: 1px;
+  width: 0;
+  background: var(--gold);
+  transform: translateX(-50%);
+  transition: width 180ms ease;
+  pointer-events: none;
+}
+.btn-parchment:hover::after,
+.btn-parchment:focus-visible::after {
+  width: calc(100% - 1.9rem);
+}
+
+/* Quiet — editorial text action; a hairline underline that inks in from
+   the left, matching the reading-column ink rules. */
+.btn-quiet {
+  position: relative;
+}
+.btn-quiet::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0.1rem;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 180ms ease;
+}
+.btn-quiet:hover::after,
+.btn-quiet:focus-visible::after {
+  width: 100%;
+}
+
+/* ================================================================== */
+/* ORNAMENTAL DIVIDERS & RULES                                         */
+/* Four densities so major transitions, panels, section headings and   */
+/* inline seams never share the same repetitive Greek-key pattern.     */
+/* ================================================================== */
+
+/* Meander band variants — differ in size + weight, not in motif. */
+.meander-band {
+  height: var(--meander-size, 14px);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'><path d='M0 12h8V4h8v8h8V0' fill='none' stroke='%234e6c92' stroke-width='1.5'/></svg>");
+  background-repeat: repeat-x;
+  background-size: 28px 14px;
+  opacity: var(--meander-opacity, 0.35);
+}
+.meander-band--major {
+  --meander-size: 18px;
+  --meander-opacity: 0.45;
+}
+.meander-band--panel {
+  --meander-size: 12px;
+  --meander-opacity: 0.28;
+}
+.meander-band--section {
+  --meander-size: 10px;
+  --meander-opacity: 0.22;
+}
+
+/* Classical divider — a hairline interrupted by a centred form. The
+   `--cd-gap` / `--cd-form` scale give four densities from one motif. */
+.classical-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--cd-gap, 0.75rem);
+  color: var(--gold-soft);
+}
+.classical-divider::before,
+.classical-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background-image: linear-gradient(
+    to var(--cd-dir, right),
+    transparent,
+    var(--line-strong)
+  );
+}
+.classical-divider--major {
+  --cd-gap: 1rem;
+}
+.classical-divider--section {
+  --cd-gap: 0.7rem;
+}
+.classical-divider--panel {
+  --cd-gap: 0.55rem;
+}
+.classical-divider--inline {
+  --cd-gap: 0.4rem;
+}
+.classical-divider--inline::before,
+.classical-divider--inline::after {
+  background-image: none;
+  background-color: color-mix(in srgb, var(--line-strong) 70%, transparent);
+}
+
+/* A slender rule with end ticks — a printed measurement rule. */
+.engraved-rule {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--line-strong) 12%,
+    var(--line-strong) 88%,
+    transparent
+  );
+}
+.engraved-rule::before,
+.engraved-rule::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: color-mix(in srgb, var(--line-strong) 90%, transparent);
+}
+.engraved-rule::before {
+  left: 12%;
+}
+.engraved-rule::after {
+  right: 12%;
+}
+.engraved-rule--carved {
+  box-shadow: 0 1px 0 var(--stone-highlight);
+}
+
+/* Ornamental corner marks — four thin L-brackets around a frame. */
+.ornamental-corners {
+  position: relative;
+}
+.ornamental-corners > .ornamental-corners__mark {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid color-mix(in srgb, var(--stone-line) 85%, transparent);
+  pointer-events: none;
+}
+.ornamental-corners__mark--tl {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.ornamental-corners__mark--tr {
+  top: -1px;
+  right: -1px;
+  border-left: none;
+  border-bottom: none;
+}
+.ornamental-corners__mark--bl {
+  bottom: -1px;
+  left: -1px;
+  border-right: none;
+  border-top: none;
+}
+.ornamental-corners__mark--br {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-carved::after,
+  .btn-parchment::after,
+  .btn-quiet::after {
+    transition: none !important;
+  }
+}
+
+/* ================================================================== */
+/* THE THRESHOLD — immersive entrance                                  */
+/* A warm parchment chamber with deep ink-blue edges, an architectural */
+/* doorway of light, faint rays and drifting dust. All geometry is CSS */
+/* /SVG; no stock imagery. Decorative layers are aria-hidden and never */
+/* overlap the text or the Continue control.                           */
+/* ================================================================== */
+.threshold-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background-color: var(--paper-base);
+  background-image:
+    radial-gradient(
+      120% 120% at 50% 46%,
+      color-mix(in srgb, var(--surface-raised) 88%, transparent) 0%,
+      transparent 46%
+    ),
+    radial-gradient(
+      130% 110% at 50% 30%,
+      rgba(0, 0, 0, 0) 50%,
+      rgba(20, 33, 58, 0.28) 100%
+    ),
+    var(--paper-grain);
+  background-size: auto, auto, 200px 200px;
+  animation: threshold-fade-in 420ms ease both;
+}
+html[data-theme="dark"] .threshold-shell {
+  background-image:
+    radial-gradient(
+      120% 120% at 50% 46%,
+      color-mix(in srgb, var(--surface-raised) 60%, transparent) 0%,
+      transparent 46%
+    ),
+    radial-gradient(
+      130% 110% at 50% 30%,
+      rgba(0, 0, 0, 0) 46%,
+      rgba(0, 0, 0, 0.55) 100%
+    ),
+    var(--paper-grain);
+}
+
+@keyframes threshold-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The closing reveal — a restrained parchment/light sweep, never a long wait. */
+.threshold-shell--closing {
+  animation: threshold-reveal 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes threshold-reveal {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  55% {
+    opacity: 1;
+    filter: brightness(1.16);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.035);
+    filter: brightness(1.3);
+  }
+}
+
+/* Architectural doorway — a tall arched frame incised into the chamber. */
+.threshold-door {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(62vw, 30rem);
+  height: min(78vh, 46rem);
+  border: 1px solid color-mix(in srgb, var(--stone-line) 90%, transparent);
+  border-bottom: none;
+  border-radius: 999px 999px 0 0;
+  box-shadow:
+    inset 0 1px 0 var(--stone-highlight),
+    0 0 0 1px color-mix(in srgb, var(--stone-line) 45%, transparent);
+  pointer-events: none;
+}
+.threshold-door::before {
+  content: "";
+  position: absolute;
+  inset: 14px 14px 0 14px;
+  border: 1px solid color-mix(in srgb, var(--stone-line) 55%, transparent);
+  border-bottom: none;
+  border-radius: 999px 999px 0 0;
+}
+.threshold-door__light {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    68% 82% at 50% 88%,
+    rgba(255, 244, 214, 0.5) 0%,
+    rgba(255, 238, 200, 0.14) 44%,
+    transparent 72%
+  );
+  animation: threshold-bloom 1400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+html[data-theme="dark"] .threshold-door__light {
+  background: radial-gradient(
+    68% 82% at 50% 88%,
+    rgba(255, 236, 190, 0.32) 0%,
+    rgba(180, 200, 224, 0.1) 46%,
+    transparent 72%
+  );
+}
+@keyframes threshold-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Soft centre bloom behind the greeting. */
+.threshold-bloom {
+  position: absolute;
+  width: min(70vw, 40rem);
+  height: min(60vh, 34rem);
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(255, 246, 222, 0.55) 0%,
+    rgba(255, 240, 205, 0.18) 42%,
+    transparent 70%
+  );
+  filter: blur(6px);
+  pointer-events: none;
+  animation: threshold-bloom-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+html[data-theme="dark"] .threshold-bloom {
+  background: radial-gradient(
+    60% 60% at 50% 50%,
+    rgba(120, 150, 200, 0.22) 0%,
+    transparent 70%
+  );
+}
+@keyframes threshold-bloom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Faint rays through the doorway. */
+.threshold-rays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    repeating-conic-gradient(
+      from 200deg at 50% 96%,
+      transparent 0deg 6deg,
+      rgba(255, 244, 214, 0.09) 6deg 7deg
+    );
+  -webkit-mask-image: radial-gradient(
+    70% 70% at 50% 80%,
+    #000 0%,
+    transparent 70%
+  );
+  mask-image: radial-gradient(70% 70% at 50% 80%, #000 0%, transparent 70%);
+}
+html[data-theme="dark"] .threshold-rays {
+  opacity: 0.35;
+}
+
+/* Drifting engraving dust. */
+.threshold-dust {
+  position: absolute;
+  left: var(--dust-x, 50%);
+  top: var(--dust-y, 50%);
+  width: var(--dust-size, 3px);
+  height: var(--dust-size, 3px);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--gold-soft) 75%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: threshold-dust-drift var(--dust-duration, 12s) linear infinite;
+  animation-delay: var(--dust-delay, 0s);
+}
+@keyframes threshold-dust-drift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  15% {
+    opacity: 0.5;
+  }
+  85% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dust-dx, 10px), -70px, 0);
+  }
+}
+
+/* Small ornamental emblem above the title. */
+.threshold-emblem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid color-mix(in srgb, var(--gold-soft) 60%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--gold);
+  box-shadow:
+    inset 0 1px 0 var(--stone-highlight),
+    0 0 0 5px color-mix(in srgb, var(--stone-line) 22%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .threshold-shell,
+  .threshold-shell--closing,
+  .threshold-door__light,
+  .threshold-bloom,
+  .threshold-dust {
+    animation: none !important;
+  }
+  .threshold-dust {
+    display: none;
+  }
+  .threshold-shell--closing {
+    opacity: 0;
   }
 }

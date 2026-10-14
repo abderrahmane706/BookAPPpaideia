@@ -34,6 +34,18 @@ export { GreekRule } from "./GreekRule";
 export type { GreekRuleProps } from "./GreekRule";
 export { GreekMeander } from "./GreekMeander";
 export type { GreekMeanderProps } from "./GreekMeander";
+export { ClassicalDivider, LabelledDivider } from "./ClassicalDivider";
+export type {
+  ClassicalDividerProps,
+  DividerDensity,
+  DividerForm,
+} from "./ClassicalDivider";
+export { GreekMeanderRule } from "./GreekMeanderRule";
+export type { GreekMeanderRuleProps, MeanderDensity } from "./GreekMeanderRule";
+export { EngravedRule } from "./EngravedRule";
+export type { EngravedRuleProps, EngravedRuleVariant } from "./EngravedRule";
+export { OrnamentalCorner } from "./OrnamentalCorner";
+export type { OrnamentalCornerProps } from "./OrnamentalCorner";
 export { ChapterPlate } from "./ChapterPlate";
 export type { ChapterPlateProps } from "./ChapterPlate";
 export { InkUnderline } from "./InkUnderline";

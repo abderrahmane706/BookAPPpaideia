@@ -1,6 +1,7 @@
 import type { Book } from "@/lib/types/book";
 import type { MindMap } from "@/lib/types/mindmap";
 import type { Note, Quote, ReadingSession, Summary } from "@/lib/types/library";
+import type { ReviewItem } from "@/lib/types/review";
 
 /**
  * Local-first persistence for the no-login build.
@@ -35,6 +36,8 @@ export interface LibrarySnapshot {
   sessions: ReadingSession[];
   /** Mind maps, flat list. A book may own many; a map belongs to one book. */
   mindMaps: MindMap[];
+  /** Agora review queue — reader-material pointers + scheduling state. */
+  reviews: ReviewItem[];
 }
 
 export const EMPTY_SNAPSHOT: LibrarySnapshot = {
@@ -44,6 +47,7 @@ export const EMPTY_SNAPSHOT: LibrarySnapshot = {
   quotes: [],
   sessions: [],
   mindMaps: [],
+  reviews: [],
 };
 
 /** True when running in a browser with a usable localStorage. */
@@ -69,8 +73,22 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  */
 export function normaliseSnapshot(raw: unknown): LibrarySnapshot | null {
   if (!isRecord(raw)) return null;
-  const books = Array.isArray(raw.books) ? (raw.books as Book[]) : [];
-  const notes = Array.isArray(raw.notes) ? (raw.notes as Note[]) : [];
+  const books = Array.isArray(raw.books)
+    ? (raw.books as Book[]).map((book) => ({
+        ...book,
+        category:
+          typeof book.category === "string" && book.category.trim()
+            ? book.category
+            : "Uncategorised",
+        tags: Array.isArray(book.tags) ? book.tags : [],
+      }))
+    : [];
+  const notes = Array.isArray(raw.notes)
+    ? (raw.notes as Note[]).map((note) => ({
+        ...note,
+        tags: Array.isArray(note.tags) ? note.tags : [],
+      }))
+    : [];
   const quotes = Array.isArray(raw.quotes) ? (raw.quotes as Quote[]) : [];
   const sessions = Array.isArray(raw.sessions)
     ? (raw.sessions as ReadingSession[])
@@ -79,7 +97,8 @@ export function normaliseSnapshot(raw: unknown): LibrarySnapshot | null {
     ? (raw.summaries as Record<string, Summary>)
     : {};
   const mindMaps = Array.isArray(raw.mindMaps) ? (raw.mindMaps as MindMap[]) : [];
-  return { books, summaries, notes, quotes, sessions, mindMaps };
+  const reviews = Array.isArray(raw.reviews) ? (raw.reviews as ReviewItem[]) : [];
+  return { books, summaries, notes, quotes, sessions, mindMaps, reviews };
 }
 
 export function loadSnapshot(): LibrarySnapshot | null {

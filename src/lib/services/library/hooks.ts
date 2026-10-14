@@ -1,6 +1,8 @@
 import { useMemo, useSyncExternalStore } from "react";
 import type { Book } from "@/lib/types/book";
 import type { BookDetail } from "@/lib/types/library";
+import type { ReviewItem } from "@/lib/types/review";
+import { compareDue, isDue } from "@/lib/services/review/scheduler";
 import { library } from "./store";
 
 /**
@@ -58,4 +60,40 @@ export function useBookDetail(id: string | null | undefined): BookDetail | null 
         .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)),
     };
   }, [snapshot, id]);
+}
+
+/** All review items for one book, oldest queued first. */
+export function useBookReviews(bookId: string | null | undefined): ReviewItem[] {
+  const snapshot = useLibrarySnapshot();
+  return useMemo(() => {
+    if (!bookId) return [];
+    return snapshot.reviews
+      .filter((r) => r.bookId === bookId)
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  }, [snapshot.reviews, bookId]);
+}
+
+/**
+ * Today's due queue, in stable order. `nowMs` is optional so an island can pin
+ * the "now" used for the whole render pass (avoiding mid-render flicker).
+ */
+export function useDueReviews(now: Date = new Date()): ReviewItem[] {
+  const snapshot = useLibrarySnapshot();
+  const stamp = now.getTime();
+  return useMemo(
+    () => snapshot.reviews.filter((r) => isDue(r, new Date(stamp))).sort(compareDue),
+    [snapshot.reviews, stamp],
+  );
+}
+
+/** Every review item, oldest queued first (for the saved-items list). */
+export function useReviews(): ReviewItem[] {
+  const snapshot = useLibrarySnapshot();
+  return useMemo(
+    () =>
+      [...snapshot.reviews].sort((a, b) =>
+        a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0,
+      ),
+    [snapshot.reviews],
+  );
 }

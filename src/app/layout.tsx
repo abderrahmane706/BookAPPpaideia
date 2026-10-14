@@ -7,6 +7,7 @@ import {
 } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ThresholdGate } from "@/components/threshold";
 
 // Classical Greek display typeface — used for H1, chapter titles, and major
 // section headings only. Weight 400 is the only cut GFS Didot ships; Didot's
@@ -90,7 +91,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <ThresholdGate>{children}</ThresholdGate>
+      </body>
     </html>
   );
 }

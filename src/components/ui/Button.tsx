@@ -11,11 +11,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    "bg-engraving text-surface hover:bg-engraving-deep shadow-card transition-colors",
+    "btn-carved bg-engraving font-medium text-surface hover:bg-engraving-deep shadow-card",
   secondary:
-    "border border-line-strong bg-surface text-ink hover:border-engraving hover:text-engraving-deep transition-colors",
+    "btn-parchment border border-line-strong bg-surface text-ink hover:border-engraving hover:text-engraving-deep",
   ghost:
-    "bg-transparent text-ink-soft hover:text-engraving-deep hover:bg-engraving/5 transition-colors",
+    "btn-quiet bg-transparent text-ink-soft hover:text-engraving-deep hover:bg-engraving/5",
   danger:
     "border border-danger/40 bg-surface text-danger hover:bg-danger hover:text-surface transition-colors",
 };

@@ -17,6 +17,13 @@ import type {
   Summary,
 } from "@/lib/types/library";
 import {
+  REVIEW_INTERVAL_MAX_DAYS,
+  type ReviewCreateInput,
+  type ReviewFeedback,
+  type ReviewItem,
+} from "@/lib/types/review";
+import { applyFeedback } from "@/lib/services/review/scheduler";
+import {
   MIND_MAP_VERSION,
   type MindMap,
   type MindMapEdge,
@@ -362,6 +369,7 @@ class LibraryStore {
       quotes: this.state.quotes.filter((q) => q.bookId !== id),
       sessions: this.state.sessions.filter((s) => s.bookId !== id),
       mindMaps: this.state.mindMaps.filter((m) => m.bookId !== id),
+      reviews: this.state.reviews.filter((r) => r.bookId !== id),
     });
     return true;
   }
@@ -445,6 +453,7 @@ class LibraryStore {
     this.commit({
       ...this.state,
       notes: this.state.notes.filter((n) => n.id !== id),
+      reviews: this.detachSource("note", id),
     });
     return true;
   }
@@ -500,6 +509,7 @@ class LibraryStore {
     this.commit({
       ...this.state,
       quotes: this.state.quotes.filter((q) => q.id !== id),
+      reviews: this.detachSource("quote", id),
     });
     return true;
   }
@@ -563,6 +573,163 @@ class LibraryStore {
       sessions: this.state.sessions.filter((s) => s.id !== id),
     });
     return true;
+  }
+
+  /* ----- reviews (Agora) ----- */
+
+  listReviews(): ReviewItem[] {
+    return this.state.reviews;
+  }
+
+  listBookReviews(bookId: string): ReviewItem[] {
+    return this.state.reviews.filter((r) => r.bookId === bookId);
+  }
+
+  getReview(id: string | null | undefined): ReviewItem | null {
+    if (!id) return null;
+    return this.state.reviews.find((r) => r.id === id) ?? null;
+  }
+
+  /** Has this exact source record already been queued? */
+  findReviewBySource(
+    sourceType: ReviewItem["sourceType"],
+    sourceId: string,
+  ): ReviewItem | null {
+    return (
+      this.state.reviews.find(
+        (r) => r.sourceType === sourceType && r.sourceId === sourceId,
+      ) ?? null
+    );
+  }
+
+  createReview(input: ReviewCreateInput): ReviewItem | null {
+    if (!this.getBook(input.bookId)) return null;
+    const prompt = input.prompt.trim();
+    const answer = input.answer.trim();
+    if (prompt.length === 0 || answer.length === 0) return null;
+    const at = nowIso();
+    const item: ReviewItem = {
+      id: uid("review"),
+      bookId: input.bookId,
+      sourceType: input.sourceType,
+      sourceId: input.sourceId ?? null,
+      prompt,
+      answer,
+      lastReviewedAt: null,
+      nextReviewAt: at,
+      intervalDays: 0,
+      repetitions: 0,
+      reviewState: "new",
+      createdAt: at,
+      updatedAt: at,
+    };
+    this.commit({ ...this.state, reviews: [item, ...this.state.reviews] });
+    return item;
+  }
+
+  updateReview(
+    id: string,
+    patch: Partial<Pick<ReviewItem, "prompt" | "answer">>,
+  ): ReviewItem | null {
+    const existing = this.getReview(id);
+    if (!existing) return null;
+    const prompt =
+      patch.prompt !== undefined ? patch.prompt.trim() : existing.prompt;
+    const answer =
+      patch.answer !== undefined ? patch.answer.trim() : existing.answer;
+    if (prompt.length === 0 || answer.length === 0) return null;
+    const updated: ReviewItem = {
+      ...existing,
+      prompt,
+      answer,
+      updatedAt: nowIso(),
+    };
+    this.commit({
+      ...this.state,
+      reviews: this.state.reviews.map((r) => (r.id === id ? updated : r)),
+    });
+    return updated;
+  }
+
+  deleteReview(id: string): boolean {
+    if (!this.state.reviews.some((r) => r.id === id)) return false;
+    this.commit({
+      ...this.state,
+      reviews: this.state.reviews.filter((r) => r.id !== id),
+    });
+    return true;
+  }
+
+  /** Record the reader's recall feedback and reschedule the item. */
+  applyReviewFeedback(
+    id: string,
+    feedback: ReviewFeedback,
+    now: Date = new Date(),
+  ): ReviewItem | null {
+    const existing = this.getReview(id);
+    if (!existing) return null;
+    const updated = applyFeedback(existing, feedback, now);
+    this.commit({
+      ...this.state,
+      reviews: this.state.reviews.map((r) => (r.id === id ? updated : r)),
+    });
+    return updated;
+  }
+
+  /**
+   * Suspend or resume an item. Resuming makes it due again immediately rather
+   * than restoring the old (possibly long-past) due date.
+   */
+  suspendReview(id: string, suspended: boolean): ReviewItem | null {
+    const existing = this.getReview(id);
+    if (!existing) return null;
+    const updated: ReviewItem = {
+      ...existing,
+      reviewState: suspended ? "suspended" : "learning",
+      nextReviewAt: suspended ? existing.nextReviewAt : nowIso(),
+      updatedAt: nowIso(),
+    };
+    this.commit({
+      ...this.state,
+      reviews: this.state.reviews.map((r) => (r.id === id ? updated : r)),
+    });
+    return updated;
+  }
+
+  /** Push an item out of the queue for `days` without changing its learning. */
+  postponeReview(id: string, days: number, now: Date = new Date()): ReviewItem | null {
+    const existing = this.getReview(id);
+    if (!existing) return null;
+    const clamped = Math.min(REVIEW_INTERVAL_MAX_DAYS, Math.max(1, Math.round(days)));
+    const nextReviewAt = new Date(
+      now.getTime() + clamped * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const updated: ReviewItem = {
+      ...existing,
+      nextReviewAt,
+      updatedAt: nowIso(),
+    };
+    this.commit({
+      ...this.state,
+      reviews: this.state.reviews.map((r) => (r.id === id ? updated : r)),
+    });
+    return updated;
+  }
+
+  /**
+   * Keep a queued review when its source note/quote is deleted (its snapshot is
+   * the reader's material), but drop the now-dead link so the UI never points at
+   * a missing record.
+   */
+  private detachSource(
+    sourceType: ReviewItem["sourceType"],
+    sourceId: string,
+  ): ReviewItem[] {
+    return this.state.reviews.map((r) =>
+      r.sourceType === sourceType && r.sourceId === sourceId
+        ? { ...r, sourceId: null }
+        : r,
+    );
   }
 
   /* ----- mind maps ----- */

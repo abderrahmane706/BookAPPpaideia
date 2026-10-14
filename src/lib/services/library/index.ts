@@ -11,8 +11,11 @@ export {
   useBook,
   useBookDetail,
   useBooks,
+  useBookReviews,
+  useDueReviews,
   useLibraryReady,
   useLibrarySnapshot,
+  useReviews,
 } from "./hooks";
 export type { LibrarySnapshot } from "./persistence";
 export { LIBRARY_STORAGE_KEY } from "./persistence";

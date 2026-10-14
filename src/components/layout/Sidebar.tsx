@@ -20,8 +20,11 @@ type SidebarLink =
 const SIDEBAR_LINKS: SidebarLink[] = [
   { kind: "route", label: "Dashboard", href: "/" },
   { kind: "route", label: "Library", href: "/library" },
-  { kind: "section", label: "Reading", id: "chapter-reading" },
-  { kind: "section", label: "Insights", id: "chapter-insights" },
+  { kind: "route", label: "Agora", href: "/agora" },
+  { kind: "route", label: "Assistant", href: "/agora/assistant" },
+  { kind: "route", label: "Insights", href: "/insights" },
+  { kind: "route", label: "Profile", href: "/profile" },
+  { kind: "section", label: "Continue Reading", id: "chapter-reading" },
   { kind: "section", label: "Reflection", id: "chapter-reflection" },
 ];
 
@@ -52,7 +55,15 @@ export function Sidebar({ className }: { className?: string }) {
               link.href === "/"
                 ? pathname === "/"
                 : pathname === link.href ||
-                  pathname.startsWith(`${link.href}/`);
+                  (pathname.startsWith(`${link.href}/`) &&
+                    !SIDEBAR_LINKS.some(
+                      (other) =>
+                        other.kind === "route" &&
+                        other.href !== link.href &&
+                        other.href.startsWith(`${link.href}/`) &&
+                        (pathname === other.href ||
+                          pathname.startsWith(`${other.href}/`)),
+                    ));
             return (
               <Link
                 key={link.label}
@@ -86,10 +97,6 @@ export function Sidebar({ className }: { className?: string }) {
             </Link>
           );
         })}
-        <span className="flex cursor-not-allowed items-center gap-3 border-l border-transparent py-2 pl-3 font-utility text-sm text-ink-faint/60">
-          <span className="h-px w-4 bg-line/60" />
-          Mind Map
-        </span>
       </nav>
 
       <p className="hidden max-w-[12rem] border-t border-line-strong/50 pt-5 font-display text-sm italic leading-relaxed text-ink-faint lg:block">

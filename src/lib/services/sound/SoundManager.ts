@@ -16,7 +16,8 @@ export type SoundName =
   | "navigation"
   | "chapter-transition"
   | "toggle"
-  | "save";
+  | "save"
+  | "threshold";
 
 interface SoundConfig {
   /** Relative path under /public. Optional — falls back to synthesis. */
@@ -38,6 +39,11 @@ interface SynthParams {
   type?: OscillatorType;
   /** Optional bandpass center for filtered noise (paper sounds). */
   filterFreq?: number;
+  /**
+   * Optional short filtered-noise breath mixed under the tone (subtle paper /
+   * air texture). Synthesised — never presented as a real recording.
+   */
+  texture?: { gain: number; filterFreq: number; duration: number };
 }
 
 const SOUNDS: Record<SoundName, SoundConfig> = {
@@ -66,6 +72,22 @@ const SOUNDS: Record<SoundName, SoundConfig> = {
   save: {
     asset: "/audio/ui/save-soft.mp3",
     synth: { freq: 620, freq2: 880, duration: 0.12, gain: 0.055, type: "sine" },
+  },
+  /**
+   * Threshold entrance — a calm, resonant chime with a faint paper/air
+   * texture. Deliberately warm and non-startling (rising minor third), a
+   * little longer than ordinary control sounds but still brief.
+   */
+  threshold: {
+    asset: "/audio/ui/threshold-chime.mp3",
+    synth: {
+      freq: 523.25, // C5
+      freq2: 784, // G5 — a calm open fifth
+      duration: 1.15,
+      gain: 0.055,
+      type: "sine",
+      texture: { gain: 0.02, filterFreq: 3200, duration: 0.5 },
+    },
   },
 };
 
@@ -157,6 +179,11 @@ class SoundManagerImpl {
 
   playToggle(): void {
     this.play("toggle");
+  }
+
+  /** Crossing the Threshold — the entrance chime. */
+  playThreshold(): void {
+    this.play("threshold");
   }
 
   // ---- Semantic feedback (reuse the centralised sounds above) ---------
@@ -281,7 +308,8 @@ class SoundManagerImpl {
     if (!ctx || !this.masterGain) return;
 
     const now = ctx.currentTime;
-    const { freq, freq2, duration, gain, type = "sine", filterFreq } = params;
+    const { freq, freq2, duration, gain, type = "sine", filterFreq, texture } =
+      params;
 
     const osc = ctx.createOscillator();
     const env = ctx.createGain();
@@ -311,6 +339,31 @@ class SoundManagerImpl {
     env.connect(this.masterGain);
     osc.start(now);
     osc.stop(now + duration + 0.02);
+
+    // Optional short filtered-noise breath beneath the tone (paper / air).
+    if (texture) {
+      const frames = Math.max(1, Math.floor(ctx.sampleRate * texture.duration));
+      const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < frames; i += 1) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / frames);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = "bandpass";
+      noiseFilter.frequency.value = texture.filterFreq;
+      noiseFilter.Q.value = 0.7;
+      const noiseEnv = ctx.createGain();
+      noiseEnv.gain.setValueAtTime(0, now);
+      noiseEnv.gain.linearRampToValueAtTime(texture.gain, now + 0.02);
+      noiseEnv.gain.exponentialRampToValueAtTime(0.0001, now + texture.duration);
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseEnv);
+      noiseEnv.connect(this.masterGain);
+      noise.start(now);
+      noise.stop(now + texture.duration + 0.02);
+    }
   }
 }
 

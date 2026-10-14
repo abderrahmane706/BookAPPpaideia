@@ -3,8 +3,10 @@
 import { useState } from "react";
 import type { Note } from "@/lib/types/library";
 import { library } from "@/lib/services/library";
+import { queueNote } from "@/lib/services/review";
 import { SoundManager } from "@/lib/services/sound/SoundManager";
 import { notify } from "@/components/ui/feedback";
+import { QueueForReviewButton } from "@/components/agora";
 
 interface Draft {
   title: string;
@@ -193,6 +195,11 @@ export function NotesPanel({ bookId, notes }: NotesPanelProps) {
                   {note.tags.length > 0 ? note.tags.join(" · ") : "No tags"}
                 </span>
                 <span className="flex items-center gap-3">
+                  <QueueForReviewButton
+                    sourceType="note"
+                    sourceId={note.id}
+                    onQueue={() => queueNote(note)}
+                  />
                   <button
                     type="button"
                     onClick={() => startEdit(note)}

@@ -12,6 +12,7 @@ import { QuotesPanel } from "./QuotesPanel";
 import { ReviewPanel } from "./ReviewPanel";
 import { ActivityPanel } from "./ActivityPanel";
 import { MindMapPanel } from "@/components/mind-map";
+import { BookAssistantPanel } from "@/components/assistant";
 
 const SECTIONS = [
   { id: "overview", index: "01", label: "Overview" },
@@ -21,6 +22,7 @@ const SECTIONS = [
   { id: "review", index: "05", label: "Review" },
   { id: "mindmap", index: "06", label: "Mind Map" },
   { id: "activity", index: "07", label: "Activity" },
+  { id: "assistant", index: "08", label: "Ask" },
 ];
 
 export interface BookWorkspaceProps {
@@ -144,6 +146,15 @@ export function BookWorkspace({ bookId }: BookWorkspaceProps) {
             sessions={sessions}
             pageCount={book.pageCount}
           />
+        </WorkspaceSection>
+
+        <WorkspaceSection
+          id="assistant"
+          index="08"
+          title="Ask PAIDEIA"
+          description="Questions answered from this book's summary, notes, quotations and review — and nothing else."
+        >
+          <BookAssistantPanel bookId={book.id} />
         </WorkspaceSection>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { InkUnderline } from "@/components/ui/InkUnderline";
+import { SearchField } from "@/components/search";
+import { ProfileAvatarLink } from "@/components/profile";
 
 /**
  * Header — the restrained top band of the scholarly workspace.
@@ -24,19 +26,10 @@ export function Header() {
           </span>
         </Link>
 
-        <div className="hidden w-full max-w-xs md:block">
-          <input
-            type="search"
-            aria-label="Search"
-            placeholder="Search books, notes..."
-            className="h-9 w-full border border-line bg-surface-raised px-3 py-2 font-body text-sm text-ink placeholder:text-ink-faint/70 focus:border-line-strong focus:outline-none"
-          />
-        </div>
+        <SearchField />
 
         <div className="flex shrink-0 items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-line-strong bg-surface-raised font-display text-xs font-semibold text-engraving">
-            A
-          </div>
+          <ProfileAvatarLink />
         </div>
       </div>
     </header>

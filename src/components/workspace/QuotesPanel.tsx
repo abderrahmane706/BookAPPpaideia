@@ -4,8 +4,10 @@ import { useState } from "react";
 import type { Quote } from "@/lib/types/library";
 import { QUOTE_HIGHLIGHT_TONES, type QuoteHighlight } from "@/lib/types/library";
 import { library } from "@/lib/services/library";
+import { queueQuote } from "@/lib/services/review";
 import { SoundManager } from "@/lib/services/sound/SoundManager";
 import { notify } from "@/components/ui/feedback";
+import { QueueForReviewButton } from "@/components/agora";
 
 const TONE_BORDER: Record<QuoteHighlight, string> = {
   gold: "border-l-gold",
@@ -231,6 +233,11 @@ export function QuotesPanel({ bookId, quotes }: QuotesPanelProps) {
                   {quote.page !== null ? `p. ${quote.page}` : "No page noted"}
                 </span>
                 <span className="flex items-center gap-3">
+                  <QueueForReviewButton
+                    sourceType="quote"
+                    sourceId={quote.id}
+                    onQueue={() => queueQuote(quote)}
+                  />
                   <button
                     type="button"
                     onClick={() => startEdit(quote)}

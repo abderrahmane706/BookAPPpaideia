@@ -80,7 +80,9 @@ export function Dashboard() {
           artwork={{ src: WELCOME_ARTWORK, position: "right", size: 0.62 }}
         >
           <div className="max-w-xl">
-            {quote ? <QuoteBlock text={quote.text} source={quote.source} /> : null}
+            {quote ? (
+              <QuoteBlock text={quote.text} source={quote.source} reveal />
+            ) : null}
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <AddBookButton />
               <span className="font-utility text-xs uppercase tracking-[0.18em] text-ink-faint">
