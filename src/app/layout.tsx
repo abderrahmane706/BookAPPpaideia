@@ -1,33 +1,42 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Cormorant_Garamond,
-  GFS_Didot,
-  Public_Sans,
-  Source_Serif_4,
-} from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThresholdGate } from "@/components/threshold";
 
+// All application fonts are self-hosted (next/font/local) so the production
+// build never depends on downloading fonts from Google at build time — the
+// Turbopack `next/font/google` loader is what broke the Vercel build. The
+// families, weights, and CSS variables are unchanged from the previous
+// `next/font/google` configuration, so the typographic identity is preserved.
+
 // Classical Greek display typeface — used for H1, chapter titles, and major
-// section headings only. Weight 400 is the only cut GFS Didot ships; Didot's
-// high contrast reads beautifully at display sizes without artificial bolding.
-const display = GFS_Didot({
+// section headings only. GFS Didot ships a single static 400 cut; the file
+// bundles Greek + Latin so the "Π" mark and any Greek text stay in-face.
+const display = localFont({
+  src: "./fonts/gfs-didot-regular.ttf",
   variable: "--font-display",
-  subsets: ["greek", "latin"],
   weight: "400",
   style: "normal",
   display: "swap",
 });
 
 // Classical editorial serif — used for editorial titles (section leads, book
-// titles, card headings) where Didot would be too austere. Sits between the
-// display face and the serif body in the typographic hierarchy.
-const editorial = Cormorant_Garamond({
+// titles, card headings) where Didot would be too austere. Variable weight
+// (300–700) with a real italic.
+const editorial = localFont({
+  src: [
+    {
+      path: "./fonts/cormorant-garamond.woff2",
+      weight: "300 700",
+      style: "normal",
+    },
+    {
+      path: "./fonts/cormorant-garamond-italic.woff2",
+      weight: "300 700",
+      style: "italic",
+    },
+  ],
   variable: "--font-editorial",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -39,19 +48,32 @@ const ornament = localFont({
   display: "swap",
 });
 
-// Literary / supporting text.
-const body = Source_Serif_4({
+// Literary / supporting text. Variable weight (200–900) with a real italic.
+const body = localFont({
+  src: [
+    {
+      path: "./fonts/source-serif-4.woff2",
+      weight: "200 900",
+      style: "normal",
+    },
+    {
+      path: "./fonts/source-serif-4-italic.woff2",
+      weight: "200 900",
+      style: "italic",
+    },
+  ],
   variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  display: "swap",
 });
 
 // Functional UI — letterspaced editorial labels, small caps, micro-text.
-const utility = Public_Sans({
+// Variable weight (100–900).
+const utility = localFont({
+  src: "./fonts/public-sans.woff2",
   variable: "--font-utility",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "100 900",
+  style: "normal",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
